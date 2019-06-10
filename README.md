@@ -1,15 +1,15 @@
 # Draft.py
 ---
-### To install:
+## To install:
 `git clone git@github.com:DFrancis84/fantasy_football_draft.git`
 ## Required imports:
 1. sqlite3
 2. pyfiglet `pip install pyfiglet`
 3. prettytable `pip install prettytable`
-
+---
 ### What is draft.py?
 Draft.py is an open source program that I created for my fantasy football league.  We prefer to do live drafts and instead of having to write all the data down on a piece of paper, I decicded to write this program. It is very simple to use! 
----
+
 ### How to use draft.py?
 To use draft.py:
 1. Clone draft.py onto your local machine
