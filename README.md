@@ -6,7 +6,7 @@
 1. sqlite3
 2. pyfiglet `pip install pyfiglet`
 3. prettytable `pip install prettytable`
----
+
 ### What is draft.py?
 Draft.py is an open source program that I created for my fantasy football league.  We prefer to do live drafts and instead of having to write all the data down on a piece of paper, I decicded to write this program. It is very simple to use! 
 ---
