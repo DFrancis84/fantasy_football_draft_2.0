@@ -24,12 +24,32 @@ def create_board(league_name):
     conn.commit()
     conn.close()
 
-def insert_draft_pick(league_name):
+def create_team_list(number_teams):
+    """Create List of all Teams Drafting"""
+    teams = []
+    i = 1
+    for _ in range(int(number_teams)):
+        team = input('Enter name for Team #{}: '.format(i))
+        teams.append(team)
+        i += 1
+    return teams
+
+def select_team(teams):
+    """Select Team"""
+    i = 1
+    for _team_ in teams:
+        print("{}. {}".format(i, _team_))
+        i += 1
+    name = input("Select Team: ")
+    name = int(name) - 1
+    return teams[name]
+
+def insert_draft_pick(league_name, teams):
     """Insert Draft Picks"""
     conn = sqlite3.connect('{}.db'.format(league_name))
     cur = conn.cursor()
     # Allow input for draft picks
-    team_name = input('Please enter Team Name: ')
+    team_name = select_team(teams)
     player_name = input('Please enter Player Name: ')
     player_position = input('Please enter Players Position: ')
     # Enter draft picks to db
@@ -81,8 +101,9 @@ def start_draft():
     create_board(league_name)
     print("This draft will contain {} picks.".format(number_picks))
     i = 0
+    teams = create_team_list(int(number_teams))
     for _ in range(number_picks):
-        insert_draft_pick(league_name)
+        insert_draft_pick(league_name, teams)
         i += 1
         if i%int(number_teams) == 0:
             create_table_per_round(league_name, number_teams)
@@ -90,6 +111,5 @@ def start_draft():
     time.sleep(3)
     print("Your draft is complete for {}!".format(league_name))
     show_draft_results(league_name)
-
 
 start_draft()
