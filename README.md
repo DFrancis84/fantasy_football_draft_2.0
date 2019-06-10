@@ -31,6 +31,5 @@ To use draft.py:
 ---
 ### What's next?
 With the base of the program live, there are a few more things that I want to add to the program.  They are as follows:
-~~1. Would like to prompt an input where you enter all the team names first, and then can CHOOSE from that dict instead of manually entering team name with every pick~~
-2. Would like to query against the database and prevent user from being able to enter the same name twice
-3. To piggyback off of #2, Would like to be able to have the list of ALL players loaded to where you can ensure that you have the right names, and possibly even be able to select from said list
+1. Would like to query against the database and prevent user from being able to enter the same name twice
+2. To piggyback off of #2, Would like to be able to have the list of ALL players loaded to where you can ensure that you have the right names, and possibly even be able to select from said list
