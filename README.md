@@ -26,7 +26,7 @@ To use draft.py:
 ### Schema for sqlite database:
 - pick - _INTEGER_ ***Primary Key, AutoIncrement***
 - team - _TEXT_
-- player Name - _TEXT_
+- player - _TEXT_
 - position - _TEXT_
 ---
 ### What's next?
