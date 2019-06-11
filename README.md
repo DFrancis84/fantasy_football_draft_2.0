@@ -15,7 +15,7 @@ To use draft.py:
 1. Clone draft.py onto your local machine
 2. CD into directory
 3. enter `python3 draft.py`
-4. Screnn will first prompt you to enter your league name
+4. Screen will first prompt you to enter your league name
     * This is used to create the `.db` file for the designated league name
 5. The next prompt will ask for the amount of teams in the league followed by a prompt to ask for number of rounds in the league.
     * This is used for the base functionality of draft.py.  It will take number of teams and multiply by number of rounds and output how many picks will take place in total for the draft.
