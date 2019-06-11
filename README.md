@@ -24,10 +24,10 @@ To use draft.py:
 7. After the final pick has been selected, it will output a table with every pick made for the draft, while finalizing the created database for easy querying.
 ---
 ### Schema for sqlite database:
-- Pick Number - _INTEGER_ ***Primary Key, AutoIncrement***
-- Team Name - _TEXT_
-- Players Name - _TEXT_
-- Players Position - _TEXT_
+- pick - _INTEGER_ ***Primary Key, AutoIncrement***
+- team - _TEXT_
+- player Name - _TEXT_
+- position - _TEXT_
 ---
 ### What's next?
 With the base of the program live, there are a few more things that I want to add to the program.  They are as follows:
