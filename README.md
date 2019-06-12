@@ -25,9 +25,10 @@ To use draft.py:
 ---
 ### Schema for sqlite database:
 - pick - _INTEGER_ ***Primary Key, AutoIncrement***
-- team - _TEXT_
+- manager - _TEXT_
 - player - _TEXT_
 - position - _TEXT_
+- nfl_team - _TEXT_
 ---
 ### What's next?
 With the base of the program live, there are a few more things that I want to add to the program.  They are as follows:
