@@ -1,4 +1,5 @@
 """Fantasy Football Draft Tool"""
+import csv
 import sqlite3
 import time
 import pyfiglet
@@ -14,9 +15,10 @@ def enter_league_definitions():
     league_name = input('Please enter league name: ')
     number_teams = input('How many teams are drafting? ')
     number_rounds = input('How many rounds in this draft? ')
+    draft_type = input('Draft Type: Snake or Custom? ').upper()
     number_picks = int(number_teams)*int(number_rounds)
     print("This draft will contain {} picks.".format(number_picks))
-    return league_name, number_teams, number_picks
+    return league_name, number_teams, number_rounds, draft_type, number_picks
 
 def create_manager_list(number_teams):
     """Create List of all Managers Drafting"""
@@ -29,6 +31,34 @@ def create_manager_list(number_teams):
         i += 1
     return managers
 
+def create_managers_list_for_snake_draft(number_teams, number_rounds):
+    """Creates list of managers for snake draft format"""
+    managers = []
+    i = 1
+    for _ in range(int(number_teams)):
+        manager = input('Enter name for Team #{}: '.format(i))
+        managers.append(manager)
+        i += 1
+    new_managers = managers.copy()
+    for i in range(number_rounds+1):
+        if i == 0:
+            i += 1
+            continue
+        if i == 1:
+            i += 1
+            continue
+        if i%2 == 0:
+            new_managers.extend(managers[::-1])
+            i += 1
+            continue
+        if i%2 == 1:
+            new_managers.extend(managers)
+            i += 1
+            continue
+        if i == number_rounds:
+            break
+    return new_managers
+
 def create_board(league_name):
     """Create DraftBoard"""
     print("Creating DraftBoard for", league_name)
@@ -36,12 +66,12 @@ def create_board(league_name):
     cur = conn.cursor()
     # Create table - DraftBoard
     cur.execute('''
-    CREATE TABLE IF NOT EXISTS {}(
-    pick INTEGER PRIMARY KEY AUTOINCREMENT,
-    manager TEXT,
-    player TEXT,
-    position TEXT,
-    nfl_team TEXT)
+CREATE TABLE IF NOT EXISTS {}(
+pick INTEGER PRIMARY KEY AUTOINCREMENT,
+manager TEXT,
+player TEXT,
+position TEXT,
+nfl_team TEXT)
     '''.format(league_name))
     conn.commit()
     conn.close()
@@ -60,6 +90,23 @@ def insert_draft_pick(league_name, managers):
     cur.execute('''
     INSERT INTO {}(manager, player, position, nfl_team) VALUES(?,?,?,?)
     '''.format(league_name), (manager_name, player_name, player_position, nfl_team))
+    conn.commit()
+    conn.close()
+
+def insert_draft_pick_for_snake_draft(league_name, manager):
+    """Insert Draft Picks"""
+    conn = sqlite3.connect('{}.db'.format(league_name))
+    cur = conn.cursor()
+    # Allow input for draft picks
+    print("{} is on the clock...".format(manager))
+    player_name = input('Please enter Players Name: ').capitalize()
+    player_position = select_position()
+    # player_position = input('Please enter Players Position: ').upper()
+    nfl_team = input('Please enter Players Team: ').upper()
+    # Enter draft picks to db
+    cur.execute('''
+INSERT INTO {}(manager, player, position, nfl_team) VALUES(?,?,?,?)
+    '''.format(league_name), (manager, player_name, player_position, nfl_team))
     conn.commit()
     conn.close()
 
@@ -108,13 +155,25 @@ def create_table_per_round(league_name, number_teams):
     # Prints table at end of each round
     print(table[-int(number_teams):])
 
-def draft(number_picks, number_teams, league_name, managers):
+def custom_draft(number_picks, number_teams, league_name, managers):
     """The Entire Draft Process"""
     _r_ = 0
     for _ in range(number_picks):
         insert_draft_pick(league_name, managers)
         _r_ += 1
         if _r_%int(number_teams) == 0:
+            create_table_per_round(league_name, number_teams)
+        time.sleep(1)
+
+def snake_draft(number_picks, number_teams, league_name, managers):
+    """The Entire Draft Process"""
+    _p_ = 0
+    i = 0
+    for _ in range(number_picks):
+        insert_draft_pick_for_snake_draft(league_name, managers[i])
+        _p_ += 1
+        i += 1
+        if _p_%int(number_teams) == 0:
             create_table_per_round(league_name, number_teams)
         time.sleep(1)
 
@@ -137,23 +196,45 @@ def show_draft_results(league_name):
     # Prints final draft results
     print(table)
 
+def create_csv_from_draft_database(league_name):
+    """Convert Database to CSV file"""
+    conn = sqlite3.connect('{}.db'.format(league_name))
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM {}".format(league_name))
+    result = cur.fetchall()
+    headers = ["pickNumber", "managerName", "playerName", "playerPosition", "teamAbbreviation"]
+    with open("{}.csv".format(league_name), "w") as csvfile:
+        filewriter = csv.writer(csvfile)
+        filewriter.writerow(headers)
+        for _r_ in result:
+            filewriter.writerow(_r_)
+
 def start_draft():
     """Starts the Draft"""
     # Print program banner
     print_banner()
     # Set League Definitions
-    league_name, number_teams, number_picks = enter_league_definitions()
+    league_name, number_teams, number_rounds, draft_type, number_picks = enter_league_definitions()
     # Create Draft Database
     create_board(league_name)
-    # Create list of teams
-    managers = create_manager_list(int(number_teams))
-    # Enter draft picks into database
-    draft(number_picks, number_teams, league_name, managers)
+    # Run draft based on designated draft type
+    if draft_type == "SNAKE":
+        # Create list of teams
+        managers = create_managers_list_for_snake_draft(int(number_teams), int(number_rounds))
+        # Enter draft picks into database
+        snake_draft(number_picks, number_teams, league_name, managers)
+    else:
+        # Create list of teams
+        managers = create_manager_list(int(number_teams))
+        # Enter draft picks into database
+        custom_draft(number_picks, number_teams, league_name, managers)
     # Print notification to let user know draft is complete
     print("Your draft is complete for {}!".format(league_name))
     # Small sleep timer for fluiditiy
     time.sleep(3)
     # Display entire draft results
     show_draft_results(league_name)
+    # Create csv file from draftboard
+    create_csv_from_draft_database(league_name)
 
 start_draft()
