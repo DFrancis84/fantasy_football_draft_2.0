@@ -3,9 +3,10 @@
 ## To install:
 `git clone git@github.com:DFrancis84/fantasy_football_draft.git`
 ## Required imports:
-1. sqlite3
-2. pyfiglet `pip install pyfiglet`
-3. prettytable `pip install prettytable`
+1. csv
+2. sqlite3
+3. pyfiglet `pip install pyfiglet`
+4. prettytable `pip install prettytable`
 ---
 ### What is draft.py?
 Draft.py is an open source program that I created for my fantasy football league.  We prefer to do live drafts and instead of having to write all the data down on a piece of paper, I decicded to write this program. It is very simple to use! 
@@ -20,8 +21,10 @@ To use draft.py:
 5. The next prompt will ask for the amount of teams in the league followed by a prompt to ask for number of rounds in the league.
     * This is used for the base functionality of draft.py.  It will take number of teams and multiply by number of rounds and output how many picks will take place in total for the draft.
     * It also utilizes the number teams input by outputing a table every round completion based on number of teams entered.
+    * Will also prompt to determine if format is a standard snake draft or if you want to perform custom draft order.
 6. Go through the entire draft entering the prompts as they appear.  With each entry, draft.py will store that data to a sqlite database for you to use to enter the results into your desired fantasy football host.
 7. After the final pick has been selected, it will output a table with every pick made for the draft, while finalizing the created database for easy querying.
+8. The final step is creating a `.csv` file of your draft.  This can be used to upload results if provider accepts `.csv` file.
 ---
 ### Schema for sqlite database:
 - pick - _INTEGER_ ***Primary Key, AutoIncrement***
