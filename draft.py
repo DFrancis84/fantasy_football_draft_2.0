@@ -26,7 +26,7 @@ def create_manager_list(number_teams):
     i = 1
     # Adds a team to the list based on number_teams input
     for _ in range(int(number_teams)):
-        manager = input('Enter name for Team #{}: '.format(i))
+        manager = input('Enter name for Team #{}: '.format(i)).capitalize()
         managers.append(manager)
         i += 1
     return managers
@@ -36,7 +36,7 @@ def create_managers_list_for_snake_draft(number_teams, number_rounds):
     managers = []
     i = 1
     for _ in range(int(number_teams)):
-        manager = input('Enter name for Team #{}: '.format(i))
+        manager = input('Enter name for Team #{}: '.format(i)).capitalize()
         managers.append(manager)
         i += 1
     new_managers = managers.copy()
@@ -69,7 +69,8 @@ def create_board(league_name):
 CREATE TABLE IF NOT EXISTS {}(
 pick INTEGER PRIMARY KEY AUTOINCREMENT,
 manager TEXT,
-player TEXT,
+player_first_name TEXT,
+player_last_name TEXT,
 position TEXT,
 nfl_team TEXT)
     '''.format(league_name))
@@ -82,14 +83,15 @@ def insert_draft_pick(league_name, managers):
     cur = conn.cursor()
     # Allow input for draft picks
     manager_name = select_manager(managers)
-    player_name = input('Please enter Players Name: ').capitalize()
-    player_position = select_position()
-    # player_position = input('Please enter Players Position: ').upper()
+    player_first_name = input('Please enter Players First Name: ').capitalize()
+    player_last_name = input('Please enter Players Last Name: ').capitalize()
+    player_position = input('Please enter Players Position: ').upper()
     nfl_team = input('Please enter Players Team: ').upper()
     # Enter draft picks to db
     cur.execute('''
-    INSERT INTO {}(manager, player, position, nfl_team) VALUES(?,?,?,?)
-    '''.format(league_name), (manager_name, player_name, player_position, nfl_team))
+INSERT INTO {}(manager, player_first_name, player_last_name, position, nfl_team) VALUES(?,?,?,?,?)
+    '''.format(league_name),
+                (manager_name, player_first_name, player_last_name, player_position, nfl_team))
     conn.commit()
     conn.close()
 
@@ -99,14 +101,15 @@ def insert_draft_pick_for_snake_draft(league_name, manager):
     cur = conn.cursor()
     # Allow input for draft picks
     print("{} is on the clock...".format(manager))
-    player_name = input('Please enter Players Name: ').capitalize()
-    player_position = select_position()
-    # player_position = input('Please enter Players Position: ').upper()
+    player_first_name = input('Please enter Players First Name: ').capitalize()
+    player_last_name = input('Please enter Players Last Name: ').capitalize()
+    player_position = input('Please enter Players Position: ').upper()
     nfl_team = input('Please enter Players Team: ').upper()
     # Enter draft picks to db
     cur.execute('''
-INSERT INTO {}(manager, player, position, nfl_team) VALUES(?,?,?,?)
-    '''.format(league_name), (manager, player_name, player_position, nfl_team))
+INSERT INTO {}(manager, player_first_name, player_last_name, position, nfl_team) VALUES(?,?,?,?,?)
+    '''.format(league_name),
+                (manager, player_first_name, player_last_name, player_position, nfl_team))
     conn.commit()
     conn.close()
 
@@ -122,34 +125,21 @@ def select_manager(managers):
     name = int(name) - 1
     return managers[name]
 
-def select_position():
-    """Select Position"""
-    positions = ["QB", "RB", "WR", "TE", "DST"]
-    _p_ = 1
-    # Iterate through list of positions and assign a number
-    for _position_ in positions:
-        print("{}. {}".format(_p_, _position_))
-        _p_ += 1
-    position = input("Select Position: ")
-    # Takes the users input, and subtracts one since lists start at 0. Converts input into name
-    position = int(position) - 1
-    return positions[position]
-
-
 def create_table_per_round(league_name, number_teams):
     """Generate Table"""
     conn = sqlite3.connect('{}.db'.format(league_name))
     cur = conn.cursor()
     cur.execute("SELECT * FROM {}".format(league_name))
     rows = cur.fetchall()
-    table = PrettyTable(['PickNumber', 'ManagerName', 'PlayerName', 'PlayerPosition', 'NFLTeam'])
+    table = PrettyTable(['PickNumber', 'ManagerName', 'PlayerFirstName', 'PlayerLastName', 'PlayerPosition', 'NFLTeam'])
     table.align["ManagerName"] = "l"
-    table.align["PlayerName"] = "l"
+    table.align["PlayerFirstName"] = "l"
+    table.align["PlayerLastName"] = "l"
     table.align["PlayerPosition"] = "l"
     table.align["NFLTeam"] = "l"
     # Iterate through all the rows and add them to prettytable
     for row in rows:
-        table.add_row([row[0], row[1], row[2], row[3], row[4]])
+        table.add_row([row[0], row[1], row[2], row[3], row[4], row[5]])
     # Notify that round has been completed
     print("Round {} Complete!".format(len(rows)/int(number_teams)))
     # Prints table at end of each round
@@ -185,14 +175,15 @@ def show_draft_results(league_name):
     cur.execute("SELECT * FROM {}".format(league_name))
     rows = cur.fetchall()
     # Create and Print display table
-    table = PrettyTable(['PickNumber', 'ManagerName', 'PlayerName', 'PlayerPosition', 'NFLTeam'])
+    table = PrettyTable(['PickNumber', 'ManagerName', 'PlayerFirstName', 'PlayerLastName', 'PlayerPosition', 'NFLTeam'])
     table.align["ManagerName"] = "l"
-    table.align["PlayerName"] = "l"
+    table.align["PlayerFirstName"] = "l"
+    table.align["PlayerLastName"] = "l"
     table.align["PlayerPosition"] = "l"
     table.align["NFLTeam"] = "l"
     # Iterate through all the rows and add them to prettytable
     for row in rows:
-        table.add_row([row[0], row[1], row[2], row[3], row[4]])
+        table.add_row([row[0], row[1], row[2], row[3], row[4], row[5]])
     # Prints final draft results
     print(table)
 
@@ -202,7 +193,7 @@ def create_csv_from_draft_database(league_name):
     cur = conn.cursor()
     cur.execute("SELECT * FROM {}".format(league_name))
     result = cur.fetchall()
-    headers = ["pickNumber", "managerName", "playerName", "playerPosition", "teamAbbreviation"]
+    headers = ["pickNumber", "managerName", "playerFirstName", "playerLastName", "playerPosition", "teamAbbreviation"]
     with open("{}.csv".format(league_name), "w") as csvfile:
         filewriter = csv.writer(csvfile)
         filewriter.writerow(headers)
