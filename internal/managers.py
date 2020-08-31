@@ -4,15 +4,16 @@ class Managers():
         self.managers_draft_order = []
         self.managers_list = len(self.managers)
 
-    def add_manager(self, manager_name):
+    def add_managers(self, number_teams):
         '''Add managers'''
-        self.managers.append(manager_name)
-
-    def display_managers(self):
-        '''Display all managers in league'''
-        # print(self.managers)
-        for i in range(0, len(self.managers)):
-            print(self.managers[i])
+        i = 1
+        for i in range(number_teams+1):
+            if i < number_teams:
+                manager_name = input('Please enter Team #{} name: '.format(i+1))
+                self.managers.append(manager_name)
+                i += 1
+            else:
+                break
 
     def create_draft_order(self, rounds):
         '''Creates draft order based off of managers and number of rounds in draft'''
